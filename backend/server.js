@@ -47,7 +47,6 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Root Route
 app.get('/', (req, res) => {
   res.json({ message: 'Study Point Management System API is Online', status: 'Active' });
 });
