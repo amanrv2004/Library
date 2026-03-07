@@ -142,12 +142,25 @@ app.post('/api/attendance/sync', async (req, res) => {
     if (!student) return res.status(404).json({ message: 'Student not found' });
 
     const now = new Date();
+    const todayStr = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
+    
+    // Prevent duplicates for the same student, type, and date
+    const existingLog = await Attendance.findOne({ 
+      studentId, 
+      date: todayStr, 
+      type: type === 'In' ? 'Check-In' : 'Check-Out' 
+    });
+
+    if (existingLog) {
+      return res.status(200).json(existingLog); // Return existing instead of error to avoid confusion
+    }
+
     const log = new Attendance({
       studentId,
       studentName: student.fullName,
       seatNumber: student.seat,
       type: type === 'In' ? 'Check-In' : 'Check-Out',
-      date: now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase(),
+      date: todayStr,
       time: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })
     });
 
