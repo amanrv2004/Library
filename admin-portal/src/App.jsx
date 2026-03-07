@@ -22,7 +22,19 @@ ChartJS.register(
   BarElement, Title, Tooltip, Legend, ArcElement
 );
 
-const API_URL = import.meta.env.VITE_API_URL || 'https://library-ochre-delta.vercel.app';
+let BASE_URL = import.meta.env.VITE_API_URL || 'https://library-ochre-delta.vercel.app';
+BASE_URL = BASE_URL.replace(/\/$/, '');
+if (BASE_URL.endsWith('/api')) {
+  BASE_URL = BASE_URL.replace(/\/api$/, '');
+}
+const API_URL = `${BASE_URL}/api`;
+console.log("Forced API_URL:", API_URL);
+BASE_URL = BASE_URL.replace(/\/$/, ''); // Remove trailing slash
+if (BASE_URL.endsWith('/api')) {
+  BASE_URL = BASE_URL.replace(/\/api$/, ''); // Remove /api if it was already there
+}
+const API_URL = `${BASE_URL}/api`;
+console.log("Connect to API at:", API_URL);
 
 const Card = ({ children, className = "", glow = false, noPadding = false }) => (
   <div className={`bg-[#111827]/80 backdrop-blur-3xl border border-white/5 rounded-[2rem] shadow-2xl transition-all duration-500 hover:border-white/10 ${glow ? 'ring-1 ring-emerald-500/30 shadow-emerald-500/10' : ''} ${className}`}>
