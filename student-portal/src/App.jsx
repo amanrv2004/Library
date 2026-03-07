@@ -128,17 +128,22 @@ export default function StudentApp() {
 
   const startScanner = () => {
     setShowScanner(true);
+    let isProcessing = false;
     setTimeout(() => {
       const scanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
       scanner.render(async (decodedText) => {
-        if (decodedText === "STUDY_HUB_AUTH_2026") {
+        if (decodedText === "STUDY_HUB_AUTH_2026" && !isProcessing) {
+          isProcessing = true;
           try {
             await axios.post(`${API_URL}/attendance/sync`, { studentId: student._id, type: 'In' });
             setScanned(true);
             scanner.clear();
             setTimeout(() => { setShowScanner(false); setScanned(false); }, 3000);
             refreshStudentData();
-          } catch (err) { alert('Verification Failed'); }
+          } catch (err) { 
+            alert('Verification Failed');
+            isProcessing = false;
+          }
         }
       });
     }, 100);
