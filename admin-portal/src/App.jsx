@@ -263,7 +263,7 @@ export default function AdminApp() {
                  {user && (
                     <div className="text-right leading-none hidden lg:block">
                         <p className="text-sm font-black text-white">{user.fullName}</p>
-                        <p className="text-[9px] text-emerald-500 font-black uppercase tracking-widest mt-1">Admin</p>
+                        <p className="text-[9px] text-emerald-500 font-black uppercase tracking-widest mt-1">Ashish</p>
                     </div>
                  )}
               </div>
