@@ -10,6 +10,8 @@ This project is configured for production-level deployment on Vercel.
 4.  Configure the following **Environment Variables** in Vercel:
     *   `MONGODB_URI`: Your MongoDB Atlas connection string.
     *   `JWT_SECRET`: A strong secret key for authentication.
+    *   `ADMIN_URL`: The URL of your Admin Portal (e.g., `http://localhost:5173` or production URL).
+    *   `STUDENT_URL`: The URL of your Student Portal (e.g., `http://localhost:5174` or production URL).
     *   `FRONTEND_URL`: The URL of your Admin Portal (after it is deployed).
     *   `STUDENT_PORTAL_URL`: The URL of your Student Portal (after it is deployed).
     *   `NODE_ENV`: Set to `production`.
