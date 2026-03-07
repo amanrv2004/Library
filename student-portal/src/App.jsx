@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import { Html5QrcodeScanner } from 'html5-qrcode';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5005/api';
+const API_URL = import.meta.env.VITE_API_URL || 'https://library-ochre-delta.vercel.app';
 
 const Card = ({ children, className = "", glow = false }) => (
   <div className={`bg-[#111827]/80 backdrop-blur-3xl border border-white/5 rounded-[2.5rem] shadow-2xl transition-all duration-500 hover:border-white/10 ${glow ? 'ring-1 ring-blue-500/30 shadow-blue-500/10' : ''} ${className}`}>
