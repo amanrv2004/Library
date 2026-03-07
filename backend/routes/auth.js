@@ -5,7 +5,7 @@ const Student = require('../models/Student');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'study-point-secret-key-2026';
+const JWT_SECRET = process.env.JWT_SECRET || (process.env.NODE_ENV === 'production' ? (() => { throw new Error('JWT_SECRET must be set in production'); })() : 'study-point-secret-key-2026');
 
 // Admin Login
 router.post('/admin/login', async (req, res) => {

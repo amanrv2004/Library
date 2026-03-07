@@ -3,11 +3,37 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const path = require('path');
+const helmet = require('helmet');
 
 const app = express();
 const PORT = process.env.PORT || 5005;
 
-app.use(cors());
+// Security Middleware
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" }
+}));
+
+// CORS Configuration
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:5174',
+  process.env.FRONTEND_URL,
+  process.env.STUDENT_PORTAL_URL
+].filter(Boolean);
+
+app.use(cors({
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV !== 'production') {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true
+}));
+
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
@@ -341,14 +367,19 @@ app.get('/api/export-pdf', async (req, res) => {
 
 const mongoURI = process.env.MONGODB_URI; 
 
-mongoose.connect(mongoURI)
-.then(() => {
-  console.log('✅ Connected to MongoDB');
+if (mongoURI) {
+  mongoose.connect(mongoURI)
+  .then(() => console.log('✅ Connected to MongoDB'))
+  .catch((error) => console.error('❌ MongoDB connection error:', error));
+} else {
+  console.warn('⚠️ MONGODB_URI is not defined in environment variables');
+}
+
+if (require.main === module) {
   app.listen(PORT, () => {
     console.log(`🚀 Server running on http://localhost:${PORT}`);
   });
-})
-.catch((error) => {
-  console.error('❌ MongoDB connection error:', error);
-  process.exit(1); // Exit if DB connection fails
-});
+}
+
+module.exports = app;
+
