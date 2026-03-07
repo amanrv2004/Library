@@ -8,7 +8,7 @@ import {
 import { Html5QrcodeScanner } from 'html5-qrcode';
 
 let BASE_URL = import.meta.env.VITE_API_URL || 'https://library-ochre-delta.vercel.app';
-BASE_URL = BASE_URL.replace(/\/$/, ''); // Remove trailing slash
+BASE_URL = BASE_URL.replace(/\/$/, ''); 
 if (BASE_URL.endsWith('/api')) {
   BASE_URL = BASE_URL.replace(/\/api$/, ''); // Remove /api if it was already there
 }
