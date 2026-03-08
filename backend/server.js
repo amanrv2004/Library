@@ -142,29 +142,28 @@ app.post('/api/attendance/sync', async (req, res) => {
 
     const now = new Date();
     const todayStr = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
+    const typeLabel = type === 'In' ? 'Check-In' : 'Check-Out';
     
-    // Prevent duplicates for the same student, type, and date
-    const existingLog = await Attendance.findOne({ 
-      studentId, 
-      date: todayStr, 
-      type: type === 'In' ? 'Check-In' : 'Check-Out' 
-    });
+    // Use findOneAndUpdate with upsert for atomic "get or create"
+    const log = await Attendance.findOneAndUpdate(
+      { 
+        studentId, 
+        date: todayStr, 
+        type: typeLabel 
+      },
+      {
+        $setOnInsert: {
+          studentName: student.fullName,
+          seatNumber: student.seat,
+          studentId,
+          type: typeLabel,
+          date: todayStr,
+          time: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })
+        }
+      },
+      { upsert: true, new: true, setDefaultsOnInsert: true }
+    );
 
-    if (existingLog) {
-      return res.status(200).json(existingLog); // Return existing instead of error to avoid confusion
-    }
-
-    const log = new Attendance({
-      studentId,
-      studentName: student.fullName,
-      seatNumber: student.seat,
-      type: type === 'In' ? 'Check-In' : 'Check-Out',
-      date: todayStr,
-      time: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })
-    });
-
-    await log.save();
-    
     // Calculate new attendance percentage (Rolling 30-day window)
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
