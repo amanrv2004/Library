@@ -126,23 +126,42 @@ export default function StudentApp() {
     localStorage.clear();
   };
 
+  const isProcessingRef = React.useRef(false);
+
   const startScanner = () => {
+    if (isProcessingRef.current) return;
     setShowScanner(true);
-    let isProcessing = false;
+    
     setTimeout(() => {
       const scanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
       scanner.render(async (decodedText) => {
-        if (decodedText === "STUDY_HUB_AUTH_2026" && !isProcessing) {
-          isProcessing = true;
+        if (decodedText === "STUDY_HUB_AUTH_2026" && !isProcessingRef.current) {
+          isProcessingRef.current = true;
           try {
             await axios.post(`${API_URL}/attendance/sync`, { studentId: student._id, type: 'In' });
             setScanned(true);
-            scanner.clear();
-            setTimeout(() => { setShowScanner(false); setScanned(false); }, 3000);
+            
+            // Stop scanner immediately
+            try {
+              await scanner.clear();
+            } catch (clearErr) {
+              console.warn("Scanner clear error:", clearErr);
+            }
+
+            setTimeout(() => { 
+              setShowScanner(false); 
+              setScanned(false); 
+              isProcessingRef.current = false;
+            }, 3000);
+            
             refreshStudentData();
           } catch (err) { 
-            alert('Verification Failed');
-            isProcessing = false;
+            console.error("Attendance Sync Error:", err);
+            alert(err.response?.data?.message || 'Verification Failed');
+            isProcessingRef.current = false;
+            // Optionally clear scanner on error too if you want to force restart
+            try { scanner.clear(); } catch(e) {}
+            setShowScanner(false);
           }
         }
       });
